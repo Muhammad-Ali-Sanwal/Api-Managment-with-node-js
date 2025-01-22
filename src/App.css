@@ -1,0 +1,10 @@
+/* Dark theme styles for the date picker dropdown */
+.custom-datepicker::part(calendar) {
+  @apply bg-black text-white; /* Dropdown background and text color */
+}
+.custom-datepicker::part(day) {
+  @apply hover:bg-gray-700 hover:text-white; /* Hover effect */
+}
+.custom-datepicker::part(day-selected) {
+  @apply bg-white text-black font-bold; /* Selected date styles */
+}
