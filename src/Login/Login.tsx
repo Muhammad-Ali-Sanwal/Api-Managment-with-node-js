@@ -1,8 +1,16 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { FC, useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
-const Login = () => {
-  const nevigate = useNavigate();
+interface EmployeeFormProps {
+  onClose: () => void;
+}
+
+const Login: FC<EmployeeFormProps> = ({ onClose }) => {
+  const handleClose = () => {
+    onClose();
+  };
+  const navigate = useNavigate();
   const [formData, setformData] = useState({
     email: "",
     password: "",
@@ -10,35 +18,39 @@ const Login = () => {
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setformData({ ...formData, [e.target.name]: e.target.value });
   };
-  const onSubmit = async (e: any) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const response = await fetch("http://localhost:5000/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      console.log("data", data);
-      setformData({
-        email: "",
-        password: "",
+
+    try {
+      const response = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
-      localStorage.setItem("userName", data.name);
-      nevigate("/user");
-    } else {
+
       const data = await response.json();
-      console.log("errooooooors frontend", data);
+
+      if (response.ok) {
+        localStorage.setItem("authToken", data.token);
+        setformData({
+          email: "",
+          password: "",
+        });
+        localStorage.setItem("userName", data.name);
+        handleClose();
+        navigate("/admin");
+      } else {
+        toast.error(data.error || "Failed to log in");
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      toast.error("Something went wrong, please try again");
     }
   };
 
   return (
     <>
-      <form
-        className="flex flex-col w-1/4 mx-auto mt-20 gap-2"
-        onSubmit={onSubmit}
-      >
-        <h1>Login</h1>
+      <form className="flex flex-col mx-auto gap-2" onSubmit={onSubmit}>
         <input
           className="border border-gray-400 p-2"
           type="email"
@@ -60,7 +72,6 @@ const Login = () => {
         <button type="submit" className="border border-black p-2">
           Login
         </button>
-        <Link to="/signup">SignUp</Link>
       </form>
     </>
   );

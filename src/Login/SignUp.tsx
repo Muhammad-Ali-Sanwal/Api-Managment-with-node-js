@@ -1,14 +1,17 @@
-import axios from "axios";
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { FC, useState } from "react";
+import toast from "react-hot-toast";
 
-const SignUp = () => {
+interface SignUpProps {
+  onClose: () => void;
+}
+const SignUp: FC<SignUpProps> = ({ onClose }) => {
   const [formData, setformData] = useState({
     username: "",
     email: "",
     password: "",
     isAdmin: false,
   });
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, type, value, checked } = e.target;
     setformData({
@@ -17,75 +20,77 @@ const SignUp = () => {
     });
   };
 
-  const onSubmit = async (e: any) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const response = await fetch("http://localhost:5000/api/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    console.log("response", response);
-    if (response.ok) {
-      setformData({
-        username: "",
-        email: "",
-        password: "",
-        isAdmin: false,
+    try {
+      const response = await fetch("http://localhost:5000/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
-    } else {
       const data = await response.json();
-      console.log("errooooooors frontend", data);
+      if (response.ok) {
+        setformData({
+          username: "",
+          email: "",
+          password: "",
+          isAdmin: false,
+        });
+        toast.success(data.message);
+        onClose();
+      } else {
+        toast.error(data.error);
+      }
+    } catch (error) {
+      toast.error((error as Error).message);
     }
   };
 
   return (
-    <form
-      className="flex flex-col w-1/4 mx-auto mt-20 gap-2"
-      onSubmit={onSubmit}
-    >
-      <h1>Sign Up</h1>
-      <input
-        className="border border-gray-400 p-2"
-        type="text"
-        placeholder="Username"
-        required
-        name="username"
-        value={formData.username}
-        onChange={onChange}
-      />
-      <input
-        className="border border-gray-400 p-2"
-        type="email"
-        placeholder="email"
-        name="email"
-        value={formData.email}
-        required
-        onChange={onChange}
-      />
-      <input
-        className="border border-gray-400 p-2"
-        type="password"
-        placeholder="Password"
-        name="password"
-        value={formData.password}
-        required
-        onChange={onChange}
-      />
-      <label className="flex items-center gap-2">
+    <>
+      <form className="flex flex-col mx-auto gap-2" onSubmit={onSubmit}>
         <input
-          type="checkbox"
-          name="isAdmin"
-          checked={formData.isAdmin}
+          className="border border-gray-400 p-2"
+          type="text"
+          placeholder="Username"
+          required
+          name="username"
+          value={formData.username}
           onChange={onChange}
         />
-        Is this user is admin
-      </label>
+        <input
+          className="border border-gray-400 p-2"
+          type="email"
+          placeholder="Email"
+          name="email"
+          value={formData.email}
+          required
+          onChange={onChange}
+        />
+        <input
+          className="border border-gray-400 p-2"
+          type="password"
+          placeholder="Password"
+          name="password"
+          value={formData.password}
+          required
+          onChange={onChange}
+        />
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            name="isAdmin"
+            checked={formData.isAdmin}
+            onChange={onChange}
+          />
+          Is this user an admin?
+        </label>
 
-      <button type="submit" className="border border-black p-2">
-        Sign Up
-      </button>
-      <Link to="/login">Login</Link>
-    </form>
+        <button type="submit" className="border border-black p-2">
+          Sign Up
+        </button>
+      </form>
+    </>
   );
 };
 

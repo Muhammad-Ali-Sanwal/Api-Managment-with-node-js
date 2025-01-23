@@ -31,6 +31,16 @@ export const formatTimestamps = (schema) => {
       "November",
       "December",
     ];
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const dayName = days[d.getDay()];
     const day = d.getDate();
     const month = months[d.getMonth()];
     const year = d.getFullYear();
@@ -40,7 +50,7 @@ export const formatTimestamps = (schema) => {
     const ampm = hours >= 12 ? "PM" : "AM";
     const formattedHours = hours % 12 || 12;
 
-    return `${month} ${day}, ${year} ${formattedHours}:${
+    return `${dayName} - ${month} ${day}, ${year} ${formattedHours}:${
       minutes < 10 ? "0" : ""
     }${minutes}:${seconds} ${ampm}`;
   }
