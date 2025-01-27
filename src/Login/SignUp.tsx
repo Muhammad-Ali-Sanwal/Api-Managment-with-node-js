@@ -23,6 +23,9 @@ const SignUp: FC<SignUpProps> = ({ onClose }) => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      if (!navigator.onLine) {
+        toast.error("You are offline. Please check your internet connection.");
+      }
       const response = await fetch("http://localhost:5000/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -48,34 +51,43 @@ const SignUp: FC<SignUpProps> = ({ onClose }) => {
 
   return (
     <>
-      <form className="flex flex-col mx-auto gap-2" onSubmit={onSubmit}>
-        <input
-          className="border border-gray-400 p-2"
-          type="text"
-          placeholder="Username"
-          required
-          name="username"
-          value={formData.username}
-          onChange={onChange}
-        />
-        <input
-          className="border border-gray-400 p-2"
-          type="email"
-          placeholder="Email"
-          name="email"
-          value={formData.email}
-          required
-          onChange={onChange}
-        />
-        <input
-          className="border border-gray-400 p-2"
-          type="password"
-          placeholder="Password"
-          name="password"
-          value={formData.password}
-          required
-          onChange={onChange}
-        />
+      <form className="flex flex-col  gap-2" onSubmit={onSubmit}>
+        <div className="flex flex-col">
+          <label>Name</label>
+          <input
+            className="border border-gray-400 p-2"
+            type="text"
+            placeholder="Username"
+            required
+            name="username"
+            value={formData.username}
+            onChange={onChange}
+          />
+        </div>
+        <div className="flex flex-col">
+          <label>Email</label>
+          <input
+            className="border border-gray-400 p-2"
+            type="email"
+            placeholder="Email"
+            name="email"
+            value={formData.email}
+            required
+            onChange={onChange}
+          />
+        </div>
+        <div className="flex flex-col">
+          <label>Password</label>
+          <input
+            className="border border-gray-400 p-2"
+            type="password"
+            placeholder="Password"
+            name="password"
+            value={formData.password}
+            required
+            onChange={onChange}
+          />
+        </div>
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
